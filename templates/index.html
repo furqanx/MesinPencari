@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #search-form {
+            margin-top: 20px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800">
+    <!-- <h1 class="text-2xl font-bold mb-4">Search Engine</h1> -->
+
+    <form id="search-form" action="/search" method="post" class="mb-8">
+        <div class="flex space-x-4 items-center justify-center">
+            <div>
+                <input type="text" name="query" id="query" placeholder="Enter your query" class="shadow block w-72 p-2 
+                border border-gray-300 rounded-md bg-slate-100 text-slate-950 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <select name="backend" id="backend" class="block w-32 p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="c_code">Rank-C</option>
+                    <option value="swish_e">Swish-e</option>
+                </select>
+            </div>
+            <div>
+                <input type="submit" value="Search" class="my-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">
+            </div>        
+        </div>
+    </form>
+
+    <div id="results">
+        {% if status %}
+            {% if backend == 'c-code' %}
+                <h3 class="ml-5 text-xl font-bold mb-2 text-stone-50">Search Results for "{{ query }}"</h3>
+                <div class="flex items-start justify-between">
+                    <div class="mx-3 p-5 pt-3 border-4 w-full rounded-lg bg-gray-400">
+                        {% for file_name, score in file_names_scores_zipped_data %}
+                            <a href="{{ url_for('show_document', filename=file_name) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg 
+                            shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                <div class="p-5 flex flex-col justify-between p-2 leading-normal">
+                                    <p class="font-normal text-gray-700 dark:text-gray-400">{{ file_name }} &nbsp; {{ score }}</p>
+                                </div>
+                            </a><br>
+                        {% endfor %}
+                    </div>
+                    <div class="mx-3 p-5 pt-3 border-4 rounded-lg text-sm bg-gray-400" style="width: 500px;">
+                        <p class="text-stone-950">waktu pencarian: {{ search_time_seconds }}</p>
+                        {% for keyword, hit in keywords_number_of_hits_zipped_data %}
+                            <p class="text-stone-950">{{ keyword }} ditemukan pada {{ hit }} dokumen</p>
+                        {% endfor %}
+                        <br>
+                    </div>
+                </div>
+            {% elif backend == 'swish-e' %}
+                <h3 class="text-xl font-bold mb-2 text-stone-50">Search Results for "{{ query }}"</h3>
+                <div class="flex items-start justify-between">
+                    <div class="mx-3 p-5 pt-3 border-4 w-full rounded-lg bg-gray-400">
+                        {% for path, filename in paths_filenames_zipped_data %}
+                            <a href="{{ url_for('show_document', filename=filename) }}" class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row 
+                            md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                <div class="p-5 flex flex-col justify-between p-2 leading-normal">
+                                    <p class="font-normal text-gray-700 dark:text-gray-400">{{ path }} &nbsp; {{ filename }}</p>
+                                </div>
+                            </a><br>
+                        {% endfor %}
+                    </div>
+                    <div class="mx-3 p-5 pt-3 border-4 rounded-lg text-sm bg-gray-400" style="width: 500px;">
+                        <p class="text-stone-950">waktu pencarian: {{ search_time_seconds }}</p>
+                        <p class="text-stone-950">jumlah dokumen ditemukan: {{ number_of_hits }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="text-red-500">pencarian tidak ditemukan</p>
+        {% endif %}
+    </div>
+
+
+</body>
+</html>
